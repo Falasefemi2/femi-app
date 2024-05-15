@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/falasefemi2/chat-app/db"
+	"github.com/falasefemi2/chat-app/utils"
 )
 
 type User struct {
@@ -12,7 +13,7 @@ type User struct {
 	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
-	CreateAt  time.Time `json:"create_at"`
+	CreatedAt time.Time `json:"create_at"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
@@ -33,31 +34,50 @@ type Message struct {
 }
 
 func CreateUser(user *User) error {
+	hashedPassword, err := utils.HashPassword(user.Password)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+
 	query := `
-	INSERT INTO users (username, email, password)
-	VALUES (?, ?, ?)
-	`
+        INSERT INTO users (username, email, password)
+        VALUES (?, ?, ?)
+    `
 
 	stmt, err := db.DB.Prepare(query)
-
 	if err != nil {
 		return fmt.Errorf("failed to prepare statement: %v", err)
 	}
-
 	defer stmt.Close()
 
-	result, err := stmt.Exec(user.Username, user.Email, user.Password)
-
+	result, err := stmt.Exec(user.Username, user.Email, hashedPassword)
 	if err != nil {
 		return fmt.Errorf("failed to execute statement: %w", err)
 	}
 
 	id, err := result.LastInsertId()
-
 	if err != nil {
 		return fmt.Errorf("failed to get last insert id: %w", err)
 	}
 
 	user.ID = int(id)
+	user.Password = hashedPassword // Store the hashed password
+
+	// Retrieve the created_at and updated_at values from the database
+	rows, err := db.DB.Query("SELECT created_at, updated_at FROM users WHERE id = ?", id)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve timestamp values: %w", err)
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		var createdAt, updatedAt time.Time
+		if err := rows.Scan(&createdAt, &updatedAt); err != nil {
+			return fmt.Errorf("failed to scan timestamp values: %w", err)
+		}
+		user.CreatedAt = createdAt
+		user.UpdatedAt = updatedAt
+	}
+
 	return nil
 }
