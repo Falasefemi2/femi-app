@@ -8,4 +8,5 @@ import (
 func RegisterRoute(server *gin.Engine) {
 	server.POST("/users", conrollers.CreateUser)
 	server.DELETE("/users", conrollers.DeleteAllUsers) // Route to delete all users
+	server.POST("/login", conrollers.Login)
 }
