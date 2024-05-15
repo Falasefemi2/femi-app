@@ -43,5 +43,21 @@ func createTables() error {
 		return fmt.Errorf("failed to create users table: %w", err)
 	}
 
+	createChannelTable := `
+        CREATE TABLE IF NOT EXISTS channels (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name VARCHAR(255) NOT NULL,
+            created_by INTEGER NOT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (created_by) REFERENCES users(id)
+        )
+    `
+
+	_, err = DB.Exec(createChannelTable)
+	if err != nil {
+		return fmt.Errorf("failed to create channels table: %w", err)
+	}
+
 	return nil
 }
