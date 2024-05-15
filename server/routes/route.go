@@ -1,9 +1,11 @@
 package routes
 
 import (
-	"fmt"
+	"github.com/falasefemi2/chat-app/conrollers"
+	"github.com/gin-gonic/gin"
 )
 
-func MakeRoute() {
-	fmt.Println("Make route")
+func RegisterRoute(server *gin.Engine) {
+	server.POST("/users", conrollers.CreateUser)
+	server.DELETE("/users", conrollers.DeleteAllUsers) // Route to delete all users
 }

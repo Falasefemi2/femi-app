@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/falasefemi2/chat-app/conrollers"
 	"github.com/falasefemi2/chat-app/db"
+	"github.com/falasefemi2/chat-app/routes"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,14 +15,12 @@ func main() {
 	}
 
 	// gin router
-	router := gin.Default()
+	server := gin.Default()
 
-	// set up routes
-	router.POST("/users", conrollers.CreateUser)
-	router.DELETE("/users", conrollers.DeleteAllUsers) // Route to delete all users
+	routes.RegisterRoute(server)
 
 	// Start the server
-	if err := router.Run(":8080"); err != nil {
+	if err := server.Run(":8080"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 
