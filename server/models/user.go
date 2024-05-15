@@ -81,3 +81,20 @@ func CreateUser(user *User) error {
 
 	return nil
 }
+
+func DeleteAllUsers() error {
+	query := "DELETE FROM users"
+
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("failed to prepare statement: %v", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec()
+	if err != nil {
+		return fmt.Errorf("failed to execute statement: %w", err)
+	}
+
+	return nil
+}

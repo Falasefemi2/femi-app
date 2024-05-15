@@ -19,6 +19,7 @@ func main() {
 
 	// set up routes
 	router.POST("/users", conrollers.CreateUser)
+	router.DELETE("/users", conrollers.DeleteAllUsers) // Route to delete all users
 
 	// Start the server
 	if err := router.Run(":8080"); err != nil {
