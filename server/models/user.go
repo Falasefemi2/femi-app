@@ -83,17 +83,18 @@ func CreateUser(user *User) error {
 }
 
 func DeleteAllUsers() error {
+	// Delete all users
 	query := "DELETE FROM users"
-
-	stmt, err := db.DB.Prepare(query)
+	_, err := db.DB.Exec(query)
 	if err != nil {
-		return fmt.Errorf("failed to prepare statement: %v", err)
+		return fmt.Errorf("failed to execute delete statement: %w", err)
 	}
-	defer stmt.Close()
 
-	_, err = stmt.Exec()
+	// Reset auto-increment counter for users table
+	query = "DELETE FROM sqlite_sequence WHERE name='users'"
+	_, err = db.DB.Exec(query)
 	if err != nil {
-		return fmt.Errorf("failed to execute statement: %w", err)
+		return fmt.Errorf("failed to reset auto-increment counter: %w", err)
 	}
 
 	return nil
