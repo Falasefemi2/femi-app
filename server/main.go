@@ -1,17 +1,28 @@
 package main
 
 import (
-	"net/http"
+	"log"
 
+	"github.com/falasefemi2/chat-app/conrollers"
+	"github.com/falasefemi2/chat-app/db"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
-	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	// Initialize database
+	if err := db.Init(); err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+
+	// gin router
+	router := gin.Default()
+
+	// set up routes
+	router.POST("/users", conrollers.CreateUser)
+
+	// Start the server
+	if err := router.Run(":8080"); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
+
 }
